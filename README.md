@@ -1,77 +1,78 @@
-# AI Embedded Workflow Template
+﻿# AI Embedded Workflow Template
 
-这是一个可复用的嵌入式项目 AI 工作流模板。它的目标不是堆很多文档，而是让 AI 每次接手任务时都按固定工程流程恢复上下文、确认边界、执行修改、完成自检。
+这是一个可复用的嵌入式项目 AI 工作流模板。
+
+目标不是堆很多文档，而是让 AI 每次接手任务时都能按固定工程流程恢复上下文、确认边界、执行修改、完成自检，并把重要经验沉淀到仓库中。
 
 ## 适用场景
 
-- MCU / BSP / 驱动 / RTOS / 控制算法等嵌入式项目。
-- 多轮 AI 协作，需要避免遗忘历史决策、误改接口、破坏分层。
-- 需要长期沉淀调试经验、设计决策和任务记录的项目。
+- MCU、BSP、驱动、RTOS、控制算法等嵌入式项目
+- RoboMaster 或其他机器人软件
+- Linux BSP / Linux Driver
+- CAN 通信和嵌入式 C/C++ 项目
+- 需要长期保留设计决策和调试经验的项目
 
 ## 推荐目录
 
 ```text
 project/
-├── README.md
-├── AGENTS.md
-├── AI_README.md
-├── docs/
-│   ├── INDEX.md
-│   ├── ARCHITECTURE.md
-│   ├── INTERFACE.md
-│   ├── CODING_RULES.md
-│   ├── DEBUG_GUIDE.md
-│   ├── DECISIONS.md
-│   ├── ERROR_CATALOG.md
-│   └── CONTROL_THEORY.md
-├── tasks/
-│   └── TASK_TEMPLATE.md
-├── templates/
-└── prompts/
+|-- README.md
+|-- AGENTS.md
+|-- AI_README.md
+|-- docs/
+|   |-- INDEX.md
+|   |-- CODING_RULES.md
+|   |-- REVIEW_CHECKLIST.md
+|   |-- DEBUG_GUIDE.md
+|   |-- DECISIONS.md
+|   |-- ERROR_CATALOG.md
+|   `-- CONTROL_THEORY.md
+|-- templates/
+|   |-- TASK_TEMPLATE.md
+|   |-- ARCHITECTURE_TEMPLATE.md
+|   |-- INTERFACE_TEMPLATE.md
+|   |-- RTOS_TEMPLATE.md
+|   `-- HARDWARE_TEMPLATE.md
+`-- prompts/
+    |-- debug.md
+    |-- review.md
+    `-- new_driver.md
 ```
 
 ## 使用方式
 
-1. 把本模板复制到真实项目根目录。
-2. 根据项目实际情况填写 `docs/` 下的核心文档。
-3. 让 AI 修改代码前，先要求它读取 `AI_README.md`、`AGENTS.md` 和任务相关文档。
-4. 大任务使用 `tasks/TASK_TEMPLATE.md` 建立任务记录。
-5. 任务完成后，把设计决策写入 `docs/DECISIONS.md`，把问题经验写入 `docs/ERROR_CATALOG.md`。
+1. 将本模板复制到真实项目根目录。
+2. 根据项目实际情况填写 `README.md` 和 `docs/INDEX.md`。
+3. 让 AI 修改代码前，先读取 `AGENTS.md`、`AI_README.md`、`docs/CODING_RULES.md` 和任务相关文档。
+4. 大任务使用 `templates/TASK_TEMPLATE.md` 建立任务输入。
+5. 任务完成后，必要时更新 `docs/DECISIONS.md`、`docs/ERROR_CATALOG.md` 或 `docs/CONTROL_THEORY.md`。
+
+## 核心原则
+
+- AI 不得跳过上下文恢复直接写代码。
+- AI 不得静默做架构、接口或模块边界决策。
+- 小 debug 不写流水账，只保留短记录。
+- 长期文档只记录会影响未来工程判断的信息。
+- 控制算法文档只保留必要公式、变量、单位、假设、限制和验证。
 
 ## 首次启动提示词
 
 ```text
-This project uses an AI embedded engineering workflow.
-Before doing anything:
-1. Read AI_README.md
-2. Read AGENTS.md
-3. Read docs/INDEX.md
-4. Read docs/CODING_RULES.md
-5. Read task-related docs and source files
+本项目使用嵌入式 AI 工程工作流。
 
-Then summarize:
-- project context
-- constraints
-- files in scope
-- files out of scope
-- risks
-- verification plan
+开始前请读取：
+1. AGENTS.md
+2. AI_README.md
+3. docs/INDEX.md
+4. docs/CODING_RULES.md
+5. 当前任务相关文档和源码
 
-Wait for confirmation before non-trivial edits.
+然后输出：
+- 项目上下文
+- 修改范围
+- 禁止修改范围
+- 风险
+- 验证计划
+
+非平凡修改前等待确认。
 ```
-
-## 核心规则
-
-- AI 不能直接开始写代码，必须先确认目标、范围、风险和验证方式。
-- 一次任务尽量局部化，避免跨层大改。
-- 架构、接口、硬件语义、协议、RTOS 行为和安全策略的变化必须记录。
-- 已解决的问题必须沉淀到 `ERROR_CATALOG.md`，避免重复踩坑。
-- 重要设计原因必须沉淀到 `DECISIONS.md`，避免后续 AI 推翻历史结论。
-
-## 最小工作流
-
-```text
-读取规则 -> 读取任务 -> 确认范围 -> 修改 -> 构建/测试 -> 自检 -> 更新文档 -> 总结
-```
-
-这个模板只提供流程骨架。真正的项目事实应写入当前项目自己的 `docs/`、`tasks/` 和源码注释中。

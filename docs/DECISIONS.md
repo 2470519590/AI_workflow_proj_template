@@ -1,30 +1,33 @@
-# DECISIONS.md
+﻿# DECISIONS.md
 
-This file records durable engineering decisions so future AI sessions do not silently reverse previous design choices.
+本文件记录持久工程决策，防止未来 AI 会话静默推翻历史结论。
 
-Update this file when a task confirms or changes:
+以下情况需要更新：
 
-- architecture or dependency direction
-- public interfaces or protocol semantics
-- RTOS task, priority, period, queue, mutex, or scheduling policy
-- hardware mapping, physical direction, unit, gear ratio, zero point, calibration, or pinout
-- communication strategy, timeout, retry, error handling, or bus speed
-- safety, watchdog, fault handling, degraded mode, boot, memory layout, or compatibility policy
+- 架构或依赖方向
+- 公共接口或协议语义
+- RTOS 任务、优先级、周期、队列、互斥锁或调度策略
+- 硬件映射、物理方向、单位、减速比、零点、标定或引脚
+- 通信策略、超时、重试、错误处理或总线速率
+- 安全、watchdog、故障处理、降级模式、启动、内存布局或兼容策略
 
-## Entry Template
+不要把小实现说明、debug 尝试或进度历史写进这里。
+
+## 条目模板
 
 ```markdown
-### YYYY-MM-DD: Decision title
+### YYYY-MM-DD: 决策标题
 
-- Decision:
-- Reason:
-- Alternatives considered:
-- Impacted files/interfaces:
-- Verification:
-- Revisit when:
+- 决策：
+- 原因：
+- 备选方案：
+- 影响文件/接口：
+- 验证：
+- 何时重新评估：
 ```
 
-## Decisions
+每条保持简短。记录决策和理由，不记录完整争论过程。
 
-Add project-specific decisions below.
+## 决策记录
 
+在下方添加项目特定决策。

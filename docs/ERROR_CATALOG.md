@@ -1,24 +1,27 @@
-# ERROR_CATALOG.md
+﻿# ERROR_CATALOG.md
 
-This file records solved problems, root causes, fixes, and engineering lessons. It is for both future AI context recovery and human project experience.
+本文件记录已解决问题、根因、修复和工程经验，用于未来 AI 恢复上下文，也用于人类复盘。
 
-Update this file after every completed debugging or defect-fix task.
+每次完成调试或缺陷修复后更新。
 
-## Entry Template
+不要把这里写成 debug 日记。只有根因明确，或问题被有意关闭后，才添加条目。
+
+## 条目模板
 
 ```markdown
-### YYYY-MM-DD: Problem title
+### YYYY-MM-DD: 问题标题
 
-- Symptoms:
-- Impact:
-- Root cause:
-- Fix:
-- Verification:
-- Engineering lesson:
-- Prevention rule:
+- 现象：
+- 影响：
+- 根因：
+- 修复：
+- 验证：
+- 工程经验：
+- 预防规则：
 ```
 
-## Error Catalog
+每条保持简短。长日志放外部位置，只在这里链接或摘录最小关键片段。
 
-Add project-specific solved issues below.
+## 问题目录
 
+在下方添加项目特定已解决问题。

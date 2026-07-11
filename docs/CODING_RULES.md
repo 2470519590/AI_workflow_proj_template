@@ -1,152 +1,177 @@
-# CODING_RULES.md
+﻿# CODING_RULES.md
 
-This document controls AI implementation behavior.
+本文档控制 AI 的实现行为。
 
-Project-specific style details may be added here later. Until then, these rules are the default for embedded, robot, RTOS, Linux BSP, and ECU work.
+项目后续可以在这里补充具体编码风格。在补充之前，本文件作为嵌入式、机器人、RTOS、Linux BSP 和 ECU 项目的默认规则。
 
-## 1. Authority
+## 1. 决策权限
 
-The AI may implement the requested change.
+AI 可以实现已明确的任务。
 
-The AI must not silently decide architecture, public interfaces, module boundaries, runtime ownership, hardware behavior, timing behavior, protocol behavior, boot behavior, memory layout, safety behavior, or compatibility policy.
+AI 不得静默决定架构、公共接口、模块边界、运行时归属、硬件行为、时序行为、协议行为、启动行为、内存布局、安全行为或兼容策略。
 
-If such a decision is needed, stop and ask for confirmation with options and trade-offs.
+需要这类决策时，必须停止，说明选项和取舍，并请求确认。
 
-## 2. Scope Discipline
+## 2. 范围纪律
 
-The AI must:
+AI 必须：
 
-- modify only files required by the task
-- preserve unrelated code and formatting
-- avoid opportunistic cleanup
-- avoid moving files or renaming symbols unless explicitly requested
-- avoid editing generated files unless the task is about the generator or generated output
-- update only directly relevant documents
+- 只修改任务需要的文件
+- 保留无关代码和格式
+- 避免顺手清理
+- 未经要求不移动文件、不重命名符号
+- 除非任务涉及生成流程，否则不直接编辑生成文件
+- 只更新直接相关文档
 
-The AI must not widen the task to make implementation easier.
+AI 不得为了方便实现而扩大任务范围。
 
-## 3. Architecture Discipline
+## 3. 文档纪律
 
-The AI must:
+项目文档必须短、准、可执行。
 
-- keep existing layer boundaries
-- respect dependency direction defined by project documents
-- keep drivers free of application policy
-- keep application code from reaching into private driver, BSP, RTOS, or kernel internals
-- keep public interfaces stable unless the task explicitly changes them
-- identify known callers before changing shared APIs
+规则：
 
-The AI must not add abstractions, callbacks, global registries, configuration switches, tasks, message types, or files unless they are required by the task and confirmed when architectural.
+- 不写流水账或命令级进度日志
+- 不把长日志粘贴到任务、debug、决策或控制文档中
+- 小 debug 记录留在父任务或 `prompts/debug.md` 输出中，直到根因明确
+- 缺陷只有在根因、修复和验证明确后，才写入 `docs/ERROR_CATALOG.md`
+- `docs/DECISIONS.md` 只记录持久工程决策
+- `docs/CONTROL_THEORY.md` 只记录未来工作必须保持的控制行为
+- 工程事实优先用短列表或表格
+- 最终提交文档前删除重复表述
 
-## 4. Embedded Runtime Rules
+默认长度限制：
 
-Default runtime rules:
+- 任务记录：一屏内说明清楚
+- debug 短记录：最多 5 条
+- 决策记录：最多 6 条
+- 问题目录条目：最多 7 条
+- 控制算法记录：只写必要公式、变量定义、假设、限制和验证
 
-- no heap allocation in deterministic runtime paths unless project documents explicitly allow it
-- no recursion in embedded runtime code
-- no blocking calls in ISR context
-- no logging, printf, sleep, allocation, or heavy parsing in ISR context
-- no unbounded loops in control, ISR, driver, or communication paths
-- no hidden state changes during initialization
-- no unchecked buffer length, index, message length, or frame length
-- no silent error handling
-- no compatibility break without explicit approval
+控制文档必须让控制工程学生能读懂。只包含实现或验证算法所需的公式，并定义状态、输入、输出、单位、更新率和饱和限制。非必要推导不要写。
 
-If a project document provides a tighter rule, follow the tighter rule.
+## 4. 架构纪律
 
-## 5. RTOS Rules
+AI 必须：
 
-When touching RTOS code, the AI must check:
+- 保持既有分层边界
+- 遵守项目文档定义的依赖方向
+- 驱动层不得包含应用策略
+- 应用层不得依赖驱动、BSP、RTOS 或 kernel 的私有内部实现
+- 除非任务明确要求，否则保持公共接口稳定
+- 修改共享 API 前识别已知调用者
 
-- task ownership
-- priority impact
-- stack impact
-- blocking behavior
-- queue, semaphore, mutex, timer, or event-group ownership
-- ISR-to-task handoff
-- initialization order
-- watchdog and fault behavior
+除非任务要求且架构层面已确认，否则 AI 不得新增抽象、回调、全局注册表、配置开关、任务、消息类型或文件。
 
-Do not introduce busy waits, priority inversions, unbounded blocking, or task creation as a side effect.
+## 5. 嵌入式运行时规则
 
-## 6. Driver And BSP Rules
+默认规则：
 
-When touching drivers or BSP code, the AI must check:
+- 确定性运行路径中不得使用堆分配，除非项目文档明确允许
+- 嵌入式运行时代码不得递归
+- ISR 中不得阻塞
+- ISR 中不得日志输出、`printf`、sleep、分配内存或做重解析
+- 控制、ISR、驱动、通信路径中不得加入无界循环
+- 初始化过程中不得隐藏改变状态
+- 所有 buffer、索引、消息长度、帧长度都要检查
+- 不得静默吞掉错误
+- 未经批准不得破坏兼容性
 
-- hardware ownership
-- register or device tree source of truth
-- initialization and deinitialization order
-- interrupt and DMA lifetime
-- buffer ownership
-- error paths
-- power, clock, and reset behavior
-- public API or userspace ABI impact
+如果项目文档有更严格规则，遵守更严格规则。
 
-Do not mix control policy into drivers. Drivers expose capability and state; higher layers decide policy.
+## 6. RTOS 规则
 
-## 7. Communication Rules
+修改 RTOS 相关代码时必须检查：
 
-When touching communication code, the AI must check:
+- 任务归属
+- 优先级影响
+- 栈影响
+- 阻塞行为
+- 队列、信号量、互斥锁、定时器、事件组归属
+- ISR 到任务的交接
+- 初始化顺序
+- watchdog 和故障行为
 
-- message ID or endpoint ownership
-- frame length
-- byte order
-- scaling and units
-- timeout and retry behavior
-- error state behavior
-- compatibility with existing senders and receivers
-- bus load or scheduling impact
+不得顺手引入 busy wait、优先级反转、无界阻塞或新任务。
 
-Do not invent protocol fields, IDs, message formats, or diagnostic behavior.
+## 7. 驱动与 BSP 规则
 
-## 8. Robot And Control Rules
+修改驱动或 BSP 时必须检查：
 
-When touching robot or control code, the AI must check:
+- 硬件归属
+- 寄存器或设备树事实来源
+- 初始化和反初始化顺序
+- 中断和 DMA 生命周期
+- buffer 归属
+- 错误路径
+- 电源、时钟、复位行为
+- 公共 API 或 userspace ABI 影响
 
-- control-loop frequency
-- actuator command authority
-- mode transition behavior
-- fail-safe behavior
-- estimator or sensor timing
-- command saturation and limits
-- communication loss behavior
+驱动只暴露能力和状态，不承载上层控制策略。
 
-Do not change physical behavior as a side effect of a software cleanup.
+## 8. 通信规则
 
-## 9. Automotive ECU Rules
+修改通信代码时必须检查：
 
-When touching ECU-like code, the AI must check:
+- 消息 ID 或端点归属
+- 帧长度
+- 字节序
+- 缩放和单位
+- 超时和重试
+- 错误状态行为
+- 与现有发送方和接收方兼容
+- 总线负载或调度影响
 
-- deterministic behavior
-- diagnostics and fault handling
-- persistent data compatibility
-- calibration data impact
-- network signal compatibility
-- boot, update, and rollback behavior
-- traceability to the task requirement
+不得编造协议字段、ID、消息格式或诊断行为。
 
-Do not weaken safety or diagnostic behavior without explicit approval.
+## 9. 机器人与控制规则
 
-## 10. Error Handling
+修改机器人或控制代码时必须检查：
 
-The AI must:
+- 控制环频率
+- 执行器命令权限
+- 模式切换
+- 失效保护
+- 估计器或传感器时序
+- 命令饱和和限制
+- 通信丢失行为
 
-- preserve existing error conventions
-- return or propagate errors where the surrounding code expects it
-- avoid swallowing failures
-- keep fallback behavior explicit
-- avoid changing reset, watchdog, degraded-mode, or fault behavior unless required
+不得把软件清理变成物理行为变化。
 
-## 11. Debug Code
+## 10. ECU 规则
 
-Temporary debug code must be removed before final response.
+修改 ECU 类代码时必须检查：
 
-Permanent debug hooks are allowed only when requested or already part of the module design. They must be controlled, documented, and safe for the runtime path.
+- 确定性行为
+- 诊断和故障处理
+- 持久化数据兼容
+- 标定数据影响
+- 网络信号兼容
+- 启动、更新、回滚行为
+- 与任务需求的可追溯性
 
-## 12. Verification
+未经明确批准，不得削弱安全或诊断行为。
 
-The AI must run the narrowest meaningful available check.
+## 11. 错误处理
 
-If no executable check exists, the AI must perform manual diff review and say that executable verification was not available.
+AI 必须：
 
-The AI must never claim a build, test, static analysis, bench check, HIL, SIL, or hardware check passed unless it was actually run.
+- 保留既有错误约定
+- 在周围代码期望的位置返回或传播错误
+- 避免吞掉失败
+- 明确 fallback 行为
+- 除非任务要求，否则不改变 reset、watchdog、降级模式或故障行为
+
+## 12. Debug 代码
+
+最终回复前必须移除临时 debug 代码。
+
+永久 debug hook 只有在任务要求或模块设计已有该机制时才允许保留，并且必须可控、可说明、对运行路径安全。
+
+## 13. 验证
+
+AI 必须运行最窄的有效检查。
+
+没有可执行检查时，必须进行人工 diff review，并说明没有可执行验证。
+
+未实际运行的 build、test、静态分析、台架、HIL、SIL 或硬件检查，不得声称通过。

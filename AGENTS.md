@@ -1,289 +1,308 @@
-# AGENTS.md
+﻿# AGENTS.md
 
-This file defines the AI operating procedure for a large embedded repository.
+本文件定义 AI 在大型嵌入式仓库中的工作流程。
 
-Assume:
+默认前提：
 
-- the codebase may exceed 300,000 lines
-- every AI session starts with no memory of previous sessions
-- chat history is not a source of truth
-- repository documents and source code are the only durable context
+- 代码规模可能超过 30 万行。
+- 每次 AI 会话都没有历史记忆。
+- 聊天记录不是事实来源。
+- 仓库文档和源码才是可持久追溯的上下文。
 
-Do not store project architecture, coding style, board details, pin maps, register values, protocol definitions, safety goals, or hardware assumptions in this file. This file defines how to recover and use that information.
+不要在本文件中写项目架构、编码风格、板级信息、引脚表、寄存器值、协议定义、安全目标或硬件假设。本文件只规定 AI 如何恢复和使用这些信息。
 
-## Prime Directive
+## 1. 核心规则
 
-Do not modify code until project context has been recovered from repository files.
+AI 不得在恢复项目上下文之前修改代码。
 
-Before editing, the AI must know:
+动手前必须知道：
 
-- what product, target, subsystem, or module is being touched
-- which layer owns the behavior
-- which interfaces and generated artifacts are involved
-- which files are in scope
-- which files are out of scope
-- which verification path applies
-- which embedded risks are present
+- 当前任务涉及哪个产品、目标、子系统或模块。
+- 哪一层拥有这个行为。
+- 涉及哪些接口、消息、生成文件或外部契约。
+- 哪些文件在范围内。
+- 哪些文件明确不允许修改。
+- 应该如何验证。
+- 是否涉及嵌入式高风险区域。
 
-If this cannot be determined from repository context, stop and ask.
+如果无法从仓库上下文确认这些信息，必须停止并询问。
 
-## Engineering Decision Authority
+## 2. 工程决策权限
 
-AI may implement approved engineering decisions. AI must not silently make them.
+AI 可以执行已经确认的工程决策，但不得静默做工程决策。
 
-Stop and ask for confirmation before proceeding when a change may affect:
+只要变更可能影响以下内容，必须先停止并请求确认：
 
-- architecture or layer boundaries
-- public interfaces or cross-module contracts
-- module ownership or dependency direction
-- runtime task structure, scheduling, or communication paths
-- hardware behavior, boot behavior, memory layout, timing, safety behavior, or external protocols
-- compatibility with existing tools, tests, calibration data, logs, or deployed systems
+- 架构或分层边界
+- 公共接口或跨模块契约
+- 模块归属或依赖方向
+- 运行时任务结构、调度或通信路径
+- 硬件行为、启动行为、内存布局、时序、安全行为或外部协议
+- 与现有工具、测试、标定数据、日志或已部署系统的兼容性
 
-When stopping for confirmation, provide:
+请求确认时必须说明：
 
-- the decision that must be made
-- viable options
-- trade-offs of each option
-- recommended option, if one is clearly better
-- files and interfaces likely to be affected
-- verification required after the decision
+- 需要决定什么
+- 可选方案
+- 每个方案的取舍
+- 推荐方案，如有
+- 可能影响的文件和接口
+- 决策后的验证方式
 
-Do not proceed until the user confirms the direction.
+用户确认前不得继续实现。
 
-## Context Recovery Order
+## 3. 上下文恢复顺序
 
-At the start of every implementation session, read context in this order:
+每次实现任务开始时，按顺序读取：
 
 1. `AGENTS.md`
-2. repository entry document, usually `README.md`
-3. project context index, usually `docs/INDEX.md` or `docs/PROJECT_CONTEXT.md`
-4. architecture map
-5. module ownership or subsystem map
-6. interface or protocol registry
-7. build, flash, test, and debug instructions
-8. known risks, decisions, limitations, and issue logs, especially `docs/DECISIONS.md` and `docs/ERROR_CATALOG.md` when present
-9. task-specific module documents
-10. task-specific source files
+2. `README.md`
+3. `AI_README.md`
+4. `docs/INDEX.md` 或同类项目索引
+5. 架构图或模块归属文档
+6. 接口、协议或消息注册表
+7. 构建、烧录、测试、调试说明
+8. 风险、决策、限制、已知问题记录，尤其是 `docs/DECISIONS.md` 和 `docs/ERROR_CATALOG.md`
+9. 当前任务相关的模块文档
+10. 当前任务相关源码
 
-Read only the documents needed for the task. Do not scan the entire repository unless the task requires it.
+只读取当前任务需要的文档。不要为了“多了解”而扫描整个仓库。
 
-If a context document does not exist, say so in the pre-edit summary. Use source code as fallback only after checking for documents.
+缺少上下文文档时，在动手前说明缺少什么。只有当任务仍然局部且低风险时，才可以退回源码作为依据。
 
-## Required Repository Context Files
+## 4. 必备长期上下文
 
-Large embedded projects should maintain durable context files. Names may differ, but the information must exist somewhere:
+大型嵌入式项目应逐步维护这些信息，文件名可以不同，但内容必须可追溯：
 
-- project overview: product purpose, targets, major software domains
-- architecture map: layers, dependency direction, runtime boundaries
-- module ownership map: which subsystem owns which files and behavior
-- interface registry: public APIs, messages, CAN frames, IOCTLs, sysfs nodes, device tree bindings, shared data contracts
-- build matrix: supported targets, toolchains, generated outputs
-- verification matrix: build, unit, integration, HIL, SIL, bench, static analysis, smoke tests
-- debug guide: logging, tracing, probes, crash dumps, serial ports, kernel logs, RTOS traces
-- risk register: timing, safety, boot, memory, concurrency, protocol, hardware, and integration risks
-- decision log: important design decisions and rejected alternatives
-- error catalog: solved problems, root causes, fixes, verification, lessons, and prevention rules
-- control theory document when the project includes observers, estimators, controllers, or actuator command policies
-- change log or session notes: recent architectural or integration changes
+- 项目概览：产品目的、目标平台、主要软件域
+- 架构图：层次、依赖方向、运行时边界
+- 模块归属图：哪些子系统拥有哪些文件和行为
+- 接口注册表：API、CAN 帧、IOCTL、sysfs、设备树 binding、共享数据契约
+- 构建矩阵：目标、工具链、生成产物
+- 验证矩阵：构建、单测、集成、SIL、HIL、台架、静态分析、冒烟测试
+- 调试指南：日志、trace、探针、crash dump、串口、kernel log、RTOS trace
+- 风险登记：时序、安全、启动、内存、并发、协议、硬件、集成风险
+- 决策记录：重要设计决策和被拒绝的方案
+- 问题目录：已解决问题、根因、修复、验证、经验和预防规则
+- 控制算法文档：观测器、估计器、控制器、状态量、命令语义
+- 变更记录：近期架构或集成变化
 
-If these files are missing, do not invent their contents. Mention the gap and proceed only when the task is still local and low risk.
+缺少这些文件时，不得编造内容。只在低风险局部任务中继续。
 
-## Pre-Edit Gate
+## 5. 动手前门禁
 
-Before editing any file, output this compact summary:
+修改任何文件前，AI 必须输出简短摘要：
 
-- `Task`: one sentence
-- `Context read`: documents and source files read
-- `Subsystem`: robot, RTOS, BSP, driver, ECU, middleware, application, tooling, or unknown
-- `Owner`: module or layer that owns the behavior
-- `Interfaces`: APIs, messages, buses, device tree nodes, tasks, queues, files, or generated artifacts affected
-- `In scope`: files or behavior to change
-- `Out of scope`: files or behavior that must not change
-- `Decision needed`: `none`, or the architecture/interface/boundary decision that requires confirmation
-- `Risks`: timing, ISR, DMA, memory, boot, protocol, safety, Linux boundary, RTOS scheduling, or none known
-- `Plan`: 2 to 5 concrete steps
-- `Verification`: exact check planned
+- `任务`：一句话说明目标
+- `已读上下文`：文档和源码文件
+- `子系统`：robot / RTOS / BSP / driver / ECU / middleware / application / tooling / unknown
+- `归属`：拥有该行为的模块或层
+- `接口`：受影响的 API、消息、总线、设备树节点、任务、队列、文件或生成产物
+- `范围内`：允许修改的文件或行为
+- `范围外`：禁止修改的文件或行为
+- `需要决策`：none，或需要用户确认的架构/接口/边界决策
+- `风险`：timing / ISR / DMA / memory / boot / protocol / safety / Linux boundary / RTOS scheduling / none known
+- `计划`：2 到 5 个具体步骤
+- `验证`：准备执行的具体检查
 
-If `Subsystem`, `Owner`, or `Interfaces` is unknown for a non-trivial code change, do not edit. If `Decision needed` is not `none`, do not edit until the user confirms the decision.
+非平凡代码修改中，如果 `子系统`、`归属` 或 `接口` 不清楚，不得编辑。若 `需要决策` 不是 `none`，必须等用户确认。
 
-## Task Routing
+## 6. 任务路由
 
-Classify the task before editing.
+编辑前先给任务分类。
 
-Robot software:
+机器人软件：
 
-- identify control loop, estimation, actuator, referee, vision, chassis, gimbal, shooter, communication, or supervision boundary
-- check timing, command authority, fail-safe behavior, bus load, and mode transitions
+- 识别控制环、估计、执行器、裁判系统、视觉、底盘、云台、发射、通信或监督边界。
+- 检查时序、命令权限、失效保护、总线负载和模式切换。
 
-Embedded RTOS:
+嵌入式 RTOS：
 
-- identify task, ISR, queue, timer, mutex, DMA, memory ownership, and priority impact
-- check blocking behavior, stack usage, initialization order, and ISR-to-task handoff
+- 识别任务、ISR、队列、定时器、互斥锁、DMA、内存归属和优先级影响。
+- 检查阻塞行为、栈使用、初始化顺序和 ISR 到任务的交接。
 
-Linux BSP or driver:
+Linux BSP 或驱动：
 
-- identify kernel, device tree, bootloader, rootfs, userspace API, sysfs, ioctl, probe/remove, power management, or interrupt path
-- check ABI compatibility, device tree binding, concurrency, lifetime, and error paths
+- 识别 kernel、device tree、bootloader、rootfs、userspace API、sysfs、ioctl、probe/remove、电源管理或中断路径。
+- 检查 ABI 兼容、设备树 binding、并发、生命周期和错误路径。
 
-Automotive ECU:
+汽车 ECU：
 
-- identify network signal, diagnostic path, state machine, nonvolatile data, calibration, safety mechanism, or boot/update path
-- check deterministic behavior, compatibility, fault handling, timing, and traceability
+- 识别网络信号、诊断路径、状态机、非易失数据、标定、安全机制或启动/更新路径。
+- 检查确定性、兼容性、故障处理、时序和可追溯性。
 
-If the task crosses domains, name each domain and keep the change split by boundary.
+跨域任务必须分别说明每个域，并按边界拆分变更。
 
-## Scope Rules
+## 7. 范围规则
 
-Allowed changes:
+允许修改：
 
-- files directly required by the task
-- tests or documentation directly required by the task
-- build or configuration files only when required for integration
+- 任务直接需要的文件
+- 任务直接需要的测试或文档
+- 集成所需的构建或配置文件
 
-Forbidden without explicit approval:
+未经明确批准，禁止：
 
-- unrelated refactoring
-- broad formatting
-- renaming public symbols or files
-- moving directories
-- replacing an established mechanism with a preferred one
-- editing generated files instead of their source
-- changing public interfaces without identifying all known users
-- changing startup, linker, memory layout, task priority, ISR behavior, DMA behavior, protocol format, persistent storage, device tree binding, boot flow, or safety behavior as a side effect
+- 无关重构
+- 大范围格式化
+- 重命名公共符号或文件
+- 移动目录
+- 用个人偏好替换既有机制
+- 直接编辑生成文件而不是源输入
+- 未识别全部使用者就修改公共接口
+- 顺手改变启动、链接、内存布局、任务优先级、ISR、DMA、协议格式、持久化格式、设备树 binding、boot flow 或安全行为
 
-When a broader change is required, stop and explain the required boundary expansion, options, trade-offs, and recommended direction.
+如果任务必须扩大边界，先停止，说明边界扩大原因、可选方案、取舍和推荐方向。
 
-## Architecture Rules
+## 8. 架构规则
 
-Preserve existing boundaries.
+保持既有边界。
 
-Before changing cross-module behavior, identify:
+修改跨模块行为前，必须识别：
 
-- dependency direction
-- public interface
-- private implementation files
-- runtime owner
-- build target impact
-- test impact
+- 依赖方向
+- 公共接口
+- 私有实现文件
+- 运行时归属
+- 构建目标影响
+- 测试影响
 
-Do not add new abstractions, callbacks, globals, tasks, configuration switches, message types, files, or layers unless the task requires them and the existing design cannot solve the problem cleanly.
+除非任务需要且现有设计无法干净解决，否则不要新增抽象、回调、全局变量、任务、配置开关、消息类型、文件或层。
 
-If the implementation may change architecture, interfaces, ownership, or dependency direction, stop before editing. Explain the trade-offs and ask for confirmation.
+如果实现可能改变架构、接口、归属或依赖方向，编辑前必须停止，说明取舍并请求确认。
 
-Prefer a small local fix over a new framework.
+优先局部小改，不要新造框架。
 
-## Context Size Control
+## 9. 上下文体积控制
 
-Avoid context explosion.
+避免上下文爆炸。
 
-Use this order:
+读取顺序：
 
-1. read durable context documents
-2. inspect module entry points
-3. inspect direct dependencies
-4. inspect callers and users of changed interfaces
-5. inspect tests and build files
+1. 持久上下文文档
+2. 模块入口文件
+3. 直接依赖
+4. 被修改接口的调用者和使用者
+5. 测试和构建文件
 
-Do not read unrelated subsystems. Do not summarize the whole project. Summarize only what affects the task.
+不要读取无关子系统。不要总结整个项目。只总结影响当前任务的内容。
 
-## Implementation Rules
+## 10. 实现规则
 
-During implementation:
+实现过程中：
 
-- change one boundary at a time
-- keep public behavior unchanged unless the task requires change
-- keep temporary debug code out of the final diff
-- update directly affected context documents when behavior, interface, build, verification, or risk changes
-- update the decision log when a design reason is confirmed or changed
-- update the error catalog after completing a debugging or defect-fix task
-- do not use chat history as justification
-- do not claim compatibility without checking known users or documents
+- 一次只改变一个边界
+- 除非任务要求，否则保持公共行为不变
+- 最终 diff 中不得留下临时 debug 代码
+- 行为、接口、构建、验证或风险变化时，更新直接相关上下文文档
+- 设计理由被确认或改变时，更新 `docs/DECISIONS.md`
+- 完成调试或缺陷修复后，更新 `docs/ERROR_CATALOG.md`
+- 不得把聊天历史作为依据
+- 未检查已知使用者或文档前，不得声称兼容
 
-## Logs And Debugging
+## 11. 文档简洁规则
 
-For logs, traces, CAN frames, serial output, RTOS traces, kernel logs, crash dumps, or debugger output:
+文档必须短、准、可执行。
 
-- keep only relevant excerpts
-- preserve timestamps, IDs, addresses, error codes, frame IDs, state transitions, and task or CPU context when important
-- separate observed facts from assumptions
-- do not treat one log line as proof
-- remove temporary instrumentation unless explicitly kept
-- document permanent debug hooks and how they are enabled
+禁止：
 
-## Verification Rules
+- 写流水账
+- 记录每条命令和每次尝试
+- 粘贴长日志
+- 把小 debug 过程拆成一堆任务
+- 把控制算法文档写成论文
 
-Run the narrowest meaningful verification available:
+建议限制：
 
-- compile affected target
-- run unit or module tests
-- run static analysis if available for the touched area
-- run integration, SIL, HIL, bench, or smoke test when required by the risk
-- inspect generated output if generators are involved
-- perform manual diff review if no executable check exists
+- 小 debug 记录最多 5 条
+- 决策记录最多 6 条
+- 问题目录条目最多 7 条
+- 控制算法只写必要公式、变量、单位、假设、限制和验证
 
-Never say verification passed unless it was run. If verification is not possible, state the exact reason.
+控制文档应让控制工程学生能读懂。不要写非必要推导。
 
-## Missing Information
+## 12. 日志与调试
 
-If information is missing:
+处理日志、trace、CAN 帧、串口输出、RTOS trace、kernel log、crash dump 或调试器输出时：
 
-1. search repository documents
-2. search source files and nearby module docs
-3. inspect tests and build scripts
-4. state what is still unknown
-5. proceed only if the unknown is low risk
-6. ask the user if the unknown affects architecture, safety, timing, hardware behavior, boot, memory, RTOS scheduling, interrupts, DMA, external protocols, or persistent data
+- 只保留相关片段
+- 保留关键时间戳、ID、地址、错误码、帧 ID、状态跳变、任务或 CPU 上下文
+- 区分观察事实和假设
+- 不用单行日志直接下结论
+- 最终移除临时插桩，除非明确保留
+- 永久 debug hook 必须说明启用方式和运行时安全性
 
-Do not invent facts to continue.
+## 13. 验证规则
 
-Do not resolve missing architecture or interface information by making a design choice silently.
+运行可用且最窄的有效验证：
 
-## Self-Review Gate
+- 编译受影响目标
+- 运行单元或模块测试
+- 对受影响区域运行静态分析
+- 风险需要时运行集成、SIL、HIL、台架或冒烟测试
+- 涉及生成器时检查生成产物
+- 没有可执行检查时，进行人工 diff review
 
-Before final response, review the diff and answer:
+未实际运行的检查，不得声称通过。无法验证时说明原因。
 
-- Which files changed?
-- Why did each file change?
-- Did the change stay inside the stated scope?
-- Did I make any engineering decision that should have required confirmation?
-- Did any public interface or generated artifact change?
-- Did any high-risk embedded area change?
-- Did architecture boundaries remain intact?
-- Were unnecessary abstractions, globals, tasks, callbacks, configs, or files added?
-- Could the implementation be simpler?
-- What verification passed?
-- What was not verified?
-- What risk remains?
-- What context document should be updated next?
-- Did this task require a `docs/DECISIONS.md` or `docs/ERROR_CATALOG.md` update?
+## 14. 信息缺失
 
-Fix issues found during self-review before responding unless user approval is required.
+信息缺失时：
 
-## Final Response Format
+1. 搜索仓库文档
+2. 搜索源码和附近模块文档
+3. 检查测试和构建脚本
+4. 说明仍然未知的信息
+5. 只有低风险未知项可以继续
+6. 如果未知项影响架构、安全、时序、硬件、启动、内存、RTOS 调度、中断、DMA、外部协议或持久化数据，必须询问用户
 
-Use this format after implementation:
+不得编造事实。不得用静默设计选择填补架构或接口信息缺口。
 
-- `Summary`: what changed
-- `Files changed`: each file and why
-- `Context used`: key documents or source areas used
-- `Verification`: checks run and result
-- `Assumptions`: explicit assumptions or `none`
-- `Risks`: remaining risks or `none known`
-- `Next`: next useful engineering step
+## 15. 自检门禁
 
-Keep the response short and specific.
+最终回复前检查：
 
-## Review-Only Requests
+- 哪些文件被修改？
+- 每个文件为什么修改？
+- 是否保持在声明范围内？
+- 是否做了本应请求确认的工程决策？
+- 是否修改公共接口或生成产物？
+- 是否影响嵌入式高风险区域？
+- 架构边界是否保持？
+- 是否新增不必要抽象、全局、任务、回调、配置或文件？
+- 实现还能否更简单？
+- 哪些验证通过？
+- 哪些未验证？
+- 剩余风险是什么？
+- 是否需要更新上下文文档？
+- 是否需要更新 `docs/DECISIONS.md` 或 `docs/ERROR_CATALOG.md`？
 
-If the user asks for review only, do not edit files.
+发现问题先修复；若修复需要用户批准，先停止说明。
 
-Report:
+## 16. 最终回复格式
 
-- findings first, ordered by severity
-- file and line references when possible
-- affected boundary or risk area
-- missing verification
-- open questions
+实现后使用：
 
-If there are no findings, say so directly and mention remaining test gaps.
+- `Summary`：改了什么
+- `Files changed`：每个文件及原因
+- `Context used`：使用了哪些关键文档或源码区域
+- `Verification`：运行了哪些检查及结果
+- `Assumptions`：显式假设，或 `none`
+- `Risks`：剩余风险，或 `none known`
+- `Next`：下一步建议
+
+保持简短具体。
+
+## 17. 只做 Review 的请求
+
+如果用户只要求 review，不得编辑文件。
+
+报告：
+
+- findings first，按严重程度排序
+- 尽量给出文件和行号
+- 受影响边界或风险区域
+- 缺失验证
+- 开放问题
+
+没有发现问题时，直接说明，并指出剩余测试缺口。

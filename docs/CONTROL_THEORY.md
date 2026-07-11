@@ -1,62 +1,63 @@
-# CONTROL_THEORY.md
+﻿# CONTROL_THEORY.md
 
-This file is a reusable placeholder for control algorithms, observers, estimators, state vectors, mode switching, and tuning notes.
+本文件记录未来工作必须保持一致的控制行为。
 
-Use it for robotics, motor control, gimbal control, vehicle control, estimator design, or any embedded project where control behavior must remain traceable.
+保持简短，让控制工程学生能读懂。不要写推导、实验流水账或调参历史，除非这些内容是实现或验证控制器所必需的。
 
-## Current Control Stage
+## 1. 记录规则
 
-Describe the current stage:
+每条控制记录只包含：
 
-- open-loop bring-up:
-- pass-through observer:
-- velocity loop:
-- position loop:
-- full-state control:
-- safety-limited control:
+- 目的
+- 状态、输入、输出定义
+- 必要公式
+- 单位和更新率
+- 假设和限制
+- 安全或饱和行为
+- 验证方法
 
-## State Vector
+## 2. 控制记录模板
 
-Define state variables, units, source, freshness, and ownership:
+### 控制器 / 观测器名称
 
-- state name:
-- unit:
-- source:
-- update rate:
-- owner:
-- consumers:
+- 目的：
+- 运行时归属：
+- 更新率：
+- 模式：
 
-## Observer / Estimator
+状态量：
 
-Describe:
+| 符号 | 含义 | 单位 | 来源 | 有效性 |
+| --- | --- | --- | --- | --- |
+| | | | | |
 
-- measured inputs
-- derived states
-- filtering/fusion method
-- data freshness policy
-- invalid data handling
-- initialization and reset behavior
+输入和输出：
 
-## Controller
+| 名称 | 方向 | 单位 | 限制 | 归属 |
+| --- | --- | --- | --- | --- |
+| | | | | |
 
-Describe:
+必要公式：
 
-- controller mode:
-- input state:
-- command output:
-- limits and saturation:
-- lifetime / timeout policy:
-- mode transition behavior:
-- safety filter interaction:
+```text
+只写实现或验证所需公式。
+定义这里出现的每个符号。
+```
 
-## Experiments
+假设：
 
-Record or link experiment notes:
+- 
 
-- direction check:
-- unit/scaling check:
-- noise/vibration check:
-- step response:
-- frequency response:
-- failure behavior:
+限制和饱和：
 
+- 
+
+无效数据处理：
+
+- 
+
+验证：
+
+- 
+
+不要在这里写调参日记。临时实验记录放在任务文件中。只有会影响未来设计的结论才沉淀到这里。

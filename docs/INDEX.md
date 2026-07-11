@@ -1,55 +1,56 @@
-# INDEX.md
+﻿# INDEX.md
 
-This file is the durable context index for a reusable embedded project.
+本文件是项目的持久上下文索引。
 
-A real project should update this file so an AI agent can quickly find both documents and code directories without relying on chat history.
+真实项目应持续更新本文件，让 AI 不依赖聊天历史也能快速找到文档和代码目录。
 
-## Project Directories
+## 1. 项目目录
 
-Fill these entries after adapting the template:
+适配真实项目后填写：
 
-- firmware source root:
-- public headers:
-- drivers or BSP/HAL:
-- middleware or RTOS:
-- tools or scripts:
-- docs:
-- tasks:
-- templates:
-- prompts:
+- 固件源码根目录：
+- 公共头文件：
+- 驱动 / BSP / HAL：
+- 中间件 / RTOS：
+- 工具或脚本：
+- 文档目录：
+- 任务记录：
+- 模板目录：
+- 提示词目录：
 
-## Non-Project Or Ignored Directories
+## 2. 默认不读或不改的目录
 
-List directories that should not be read or modified by default:
+列出 AI 默认不应读取或修改的目录：
 
-- generated build outputs:
-- copied reference projects:
-- IDE metadata:
-- external templates:
+- 生成的构建输出：
+- 复制来的参考工程：
+- IDE 元数据：
+- 外部模板：
 
-## Required Documents
+## 3. 必读文档
 
-- `AGENTS.md`: AI operating procedure.
-- `AI_README.md`: workflow explanation.
-- `docs/CODING_RULES.md`: implementation rules.
-- `docs/REVIEW_CHECKLIST.md`: final self-review checklist.
-- `docs/DECISIONS.md`: durable design-decision log.
-- `docs/ERROR_CATALOG.md`: solved-problem and engineering-experience log.
+- `AGENTS.md`：AI 工作流程总规则
+- `AI_README.md`：模板使用说明
+- `docs/CODING_RULES.md`：实现行为规则
+- `docs/REVIEW_CHECKLIST.md`：最终自检清单
+- `docs/DECISIONS.md`：长期工程决策记录
+- `docs/ERROR_CATALOG.md`：已解决问题和工程经验
 
-## Task-Specific Documents
+## 4. 任务相关文档
 
-Add real project documents here as they are created:
+真实项目创建后在这里补充：
 
-- architecture:
-- interfaces or protocols:
-- hardware:
-- RTOS or scheduling:
-- debug guide:
-- git workflow:
-- control theory or algorithm design:
+- 架构：
+- 接口或协议：
+- 硬件：
+- RTOS 或调度：
+- 调试指南：
+- Git 工作流：
+- 控制理论或算法设计：
 
-## Task Records
+## 5. 任务记录
 
-- `templates/TASK_TEMPLATE.md`: template for a new AI implementation task.
-- `tasks/YYYY-MM-DD-topic.md`: completed task records.
+- `templates/TASK_TEMPLATE.md`：新建 AI 实现任务的模板
+- `tasks/YYYY-MM-DD-topic.md`：已完成任务记录，真实项目可按需创建
 
+不要把本文件写成目录树全集。只记录 AI 恢复上下文时真正需要的入口。

@@ -1,104 +1,114 @@
-# REVIEW_CHECKLIST.md
+﻿# REVIEW_CHECKLIST.md
 
-This checklist controls AI self-review output.
+本清单控制 AI 的最终自检输出。
 
-The AI must complete this review before final response.
+最终回复前必须完成本清单。
 
-## 1. Scope
+## 1. 范围
 
-- [ ] I changed only files allowed by the task.
-- [ ] I avoided unrelated refactoring, renaming, movement, and formatting.
-- [ ] I did not modify generated files unless required.
-- [ ] I did not leave temporary experiments or debug code.
+- [ ] 只修改了任务允许的文件。
+- [ ] 没有做无关重构、重命名、移动或格式化。
+- [ ] 没有在非必要情况下修改生成文件。
+- [ ] 没有留下临时实验代码或 debug 代码。
 
-## 2. Context
+## 2. 上下文
 
-- [ ] I read `AGENTS.md`.
-- [ ] I read `AI_README.md` if present.
-- [ ] I read `docs/INDEX.md` if present.
-- [ ] I read `docs/CODING_RULES.md`.
-- [ ] I read `docs/DECISIONS.md` if present.
-- [ ] I read `docs/ERROR_CATALOG.md` if present.
-- [ ] I read the task-specific documents listed in the task.
-- [ ] I inspected the source files before editing.
-- [ ] I did not rely on chat history as project truth.
+- [ ] 已读取 `AGENTS.md`。
+- [ ] 已读取 `AI_README.md`。
+- [ ] 已读取 `docs/INDEX.md`，如果存在。
+- [ ] 已读取 `docs/CODING_RULES.md`。
+- [ ] 已读取 `docs/DECISIONS.md`，如果存在。
+- [ ] 已读取 `docs/ERROR_CATALOG.md`，如果存在。
+- [ ] 已读取任务指定的相关文档。
+- [ ] 编辑前已检查相关源码。
+- [ ] 没有把聊天历史当作项目事实。
 
-## 3. Engineering Decisions
+## 3. 工程决策
 
-- [ ] I did not silently make architecture, interface, or module-boundary decisions.
-- [ ] If a decision was needed, I stopped and asked for confirmation.
-- [ ] I documented assumptions instead of hiding them.
-- [ ] I did not invent hardware, timing, protocol, safety, or compatibility facts.
+- [ ] 没有静默做架构、接口或模块边界决策。
+- [ ] 如需决策，已停止并请求确认。
+- [ ] 已显式记录假设，没有隐藏假设。
+- [ ] 没有编造硬件、时序、协议、安全或兼容性事实。
 
-## 4. Architecture
+## 4. 架构
 
-- [ ] Existing layer boundaries remain intact.
-- [ ] Dependency direction remains valid.
-- [ ] Drivers do not contain application policy.
-- [ ] Application code does not depend on private lower-layer internals.
-- [ ] Public interfaces remain unchanged unless explicitly required.
-- [ ] Known users were checked before changing any shared interface.
+- [ ] 既有层次边界保持不变。
+- [ ] 依赖方向仍然有效。
+- [ ] 驱动层没有应用策略。
+- [ ] 应用层没有依赖下层私有内部实现。
+- [ ] 公共接口没有变化，除非任务明确要求。
+- [ ] 修改共享接口前已检查已知使用者。
 
-## 5. Embedded Runtime Risk
+## 5. 嵌入式运行时风险
 
-- [ ] No unsafe heap allocation was added to deterministic runtime paths.
-- [ ] No recursion was added to embedded runtime code.
-- [ ] No unbounded loop was added to runtime-critical code.
-- [ ] No blocking call was added to ISR or timing-critical context.
-- [ ] No unsafe buffer, length, index, or frame parsing behavior was added.
-- [ ] Error handling remains explicit.
+- [ ] 没有在确定性运行路径加入不安全堆分配。
+- [ ] 没有加入递归。
+- [ ] 没有在运行时关键路径加入无界循环。
+- [ ] 没有在 ISR 或时序关键上下文加入阻塞调用。
+- [ ] 没有加入不安全 buffer、长度、索引或帧解析行为。
+- [ ] 错误处理仍然显式。
 
-## 6. RTOS, ISR, DMA
+## 6. RTOS / ISR / DMA
 
-- [ ] ISR work remains minimal.
-- [ ] ISR-to-task handoff remains safe.
-- [ ] Task priority, blocking behavior, and stack impact were considered.
-- [ ] Queue, semaphore, mutex, timer, or event-group ownership remains clear.
-- [ ] DMA, cache, buffer ownership, and memory lifetime remain safe.
+- [ ] ISR 工作量仍然最小。
+- [ ] ISR 到任务交接仍然安全。
+- [ ] 已考虑任务优先级、阻塞行为和栈影响。
+- [ ] 队列、信号量、互斥锁、定时器或事件组归属清楚。
+- [ ] DMA、cache、buffer 归属和内存生命周期安全。
 
-## 7. Driver, BSP, Linux Boundary
+## 7. 驱动 / BSP / Linux 边界
 
-- [ ] Initialization and deinitialization order remain correct.
-- [ ] Register, pin, clock, reset, and power behavior were not changed accidentally.
-- [ ] Device tree, sysfs, ioctl, kernel ABI, or userspace ABI changes were explicit.
-- [ ] Probe, remove, interrupt, and error paths remain safe where relevant.
+- [ ] 初始化和反初始化顺序仍然正确。
+- [ ] 没有意外改变寄存器、引脚、时钟、复位或电源行为。
+- [ ] device tree、sysfs、ioctl、kernel ABI 或 userspace ABI 变化是显式的。
+- [ ] probe、remove、中断和错误路径在相关场景下仍然安全。
 
-## 8. Communication And Control
+## 8. 通信与控制
 
-- [ ] Message IDs, frame lengths, byte order, scaling, and units remain correct.
-- [ ] Timeout, retry, and error-state behavior remain intentional.
-- [ ] CAN or other bus load impact was considered where relevant.
-- [ ] Control-loop timing and actuator command behavior were not changed accidentally.
-- [ ] Robot mode transitions and fail-safe behavior remain intentional.
+- [ ] 消息 ID、帧长度、字节序、缩放和单位仍然正确。
+- [ ] 超时、重试和错误状态行为是有意的。
+- [ ] 相关时已考虑 CAN 或其他总线负载影响。
+- [ ] 没有意外改变控制环时序和执行器命令行为。
+- [ ] 机器人模式切换和失效保护仍然有意。
 
-## 9. ECU And Persistent Data
+## 9. ECU 与持久化数据
 
-- [ ] Diagnostics and fault handling remain intentional.
-- [ ] Persistent data, calibration, and compatibility impact were considered.
-- [ ] Boot, update, rollback, or safety behavior was not changed accidentally.
-- [ ] Deterministic behavior remains preserved where required.
+- [ ] 诊断和故障处理仍然有意。
+- [ ] 已考虑持久化数据、标定和兼容性影响。
+- [ ] 没有意外改变启动、更新、回滚或安全行为。
+- [ ] 需要确定性时，确定性行为仍然保持。
 
-## 10. Verification
+## 10. 验证
 
-- [ ] The narrowest meaningful build or test was run, or the reason it could not run is stated.
-- [ ] Static analysis was run if available and relevant.
-- [ ] Generated output was inspected if generators were involved.
-- [ ] Hardware, bench, SIL, HIL, or smoke testing needs are stated when relevant.
-- [ ] Remaining unverified risk is stated.
-- [ ] `docs/ERROR_CATALOG.md` was updated if this task fixed a concrete problem.
-- [ ] `docs/DECISIONS.md` was updated if this task confirmed or changed a design decision.
-- [ ] `docs/CONTROL_THEORY.md` was updated if this task affected control, observer, estimator, or state-vector design.
+- [ ] 已运行最窄有效 build 或 test，或说明无法运行原因。
+- [ ] 相关且可用时已运行静态分析。
+- [ ] 涉及生成器时已检查生成产物。
+- [ ] 相关时已说明硬件、台架、SIL、HIL 或冒烟测试需求。
+- [ ] 已说明剩余未验证风险。
+- [ ] 如果修复了具体问题，已更新 `docs/ERROR_CATALOG.md`。
+- [ ] 如果确认或改变设计决策，已更新 `docs/DECISIONS.md`。
+- [ ] 如果影响控制、观测器、估计器或状态量设计，已更新 `docs/CONTROL_THEORY.md`。
 
-## 11. Simplicity
+## 11. 文档质量
 
-- [ ] The solution is the smallest valid change.
-- [ ] No unnecessary abstraction, callback, global, task, config switch, file, or layer was added.
-- [ ] The implementation follows nearby patterns.
-- [ ] A simpler option was considered.
+- [ ] 没有写流水账或命令级进度日志。
+- [ ] 小 debug 记录留在父任务中，除非已成为已解决问题。
+- [ ] 没有把长日志粘贴进文档。
+- [ ] 只在信息具备长期价值时更新长期文档。
+- [ ] 控制算法文档能让控制工程学生读懂。
+- [ ] 只包含必要公式、变量、单位、假设、限制和验证。
+- [ ] 已删除重复或臃肿表述。
 
-## 12. Mandatory Final Report
+## 12. 简洁性
 
-The final response must include:
+- [ ] 方案是满足目标的最小有效修改。
+- [ ] 没有新增不必要抽象、回调、全局、任务、配置开关、文件或层。
+- [ ] 实现遵循附近已有模式。
+- [ ] 已考虑更简单方案。
+
+## 13. 最终报告
+
+最终回复必须包含：
 
 - `Summary`
 - `Files changed`
@@ -108,4 +118,4 @@ The final response must include:
 - `Risks`
 - `Next`
 
-If any checklist item is not satisfied, the final response must say why.
+任何未满足的检查项，都必须在最终回复中说明原因。
