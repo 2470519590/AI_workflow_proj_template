@@ -21,6 +21,22 @@
 - [ ] 文档
 - [ ] 只做 Review
 
+当前职责：
+
+- [ ] SOL：架构 / 高风险 / 复杂调试 / 系统设计 / 高风险 review
+- [ ] TERRA：实现 / bug fix / driver / RTOS
+- [ ] LUNA：文档 / 解释 / 简单分析 / 重复任务
+
+职责选择理由：
+
+- 
+
+是否允许自动升级职责：
+
+- [ ] 不允许，必须先询问
+- [ ] 允许从 LUNA 升级到 TERRA
+- [ ] 允许从 TERRA 升级到 SOL 做风险判断，但不得自动实现大改
+
 任务粒度：
 
 - [ ] 主任务
@@ -47,6 +63,7 @@
 
 - `AGENTS.md`
 - `AI_README.md`
+- `docs/AGENT_MODEL_ROLES.md`
 - `docs/INDEX.md`
 - `docs/CODING_RULES.md`
 - `docs/REVIEW_CHECKLIST.md`
@@ -114,6 +131,12 @@ AI 是否可以做架构、接口或模块边界决策？
 本任务已批准的决策：
 
 - none
+
+职责边界：
+
+- SOL 可以识别风险和提出方案，但重大变化仍需确认。
+- TERRA 只能按既有架构实现，不得改接口、协议或模块边界。
+- LUNA 只能做文档、解释、简单分析和重复任务，不得做架构决策。
 
 ## 8. 嵌入式风险区域
 

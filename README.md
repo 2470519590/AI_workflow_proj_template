@@ -21,6 +21,7 @@ project/
 |-- AI_README.md
 |-- docs/
 |   |-- INDEX.md
+|   |-- AGENT_MODEL_ROLES.md
 |   |-- CODING_RULES.md
 |   |-- REVIEW_CHECKLIST.md
 |   |-- DEBUG_GUIDE.md
@@ -50,6 +51,7 @@ project/
 ## 核心原则
 
 - AI 不得跳过上下文恢复直接写代码。
+- 输入任务前先确认当前职责：SOL / TERRA / LUNA。
 - AI 不得静默做架构、接口或模块边界决策。
 - 小 debug 不写流水账，只保留短记录。
 - 长期文档只记录会影响未来工程判断的信息。

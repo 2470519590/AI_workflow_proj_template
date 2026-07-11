@@ -31,6 +31,7 @@
 
 - `AGENTS.md`：AI 工作流程总规则
 - `AI_README.md`：模板使用说明
+- `docs/AGENT_MODEL_ROLES.md`：SOL / TERRA / LUNA 职责和模型映射
 - `docs/CODING_RULES.md`：实现行为规则
 - `docs/REVIEW_CHECKLIST.md`：最终自检清单
 - `docs/DECISIONS.md`：长期工程决策记录

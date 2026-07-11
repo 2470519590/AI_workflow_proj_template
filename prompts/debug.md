@@ -4,7 +4,8 @@
 
 要求：
 
-- 先读取 `AGENTS.md`、`AI_README.md`、`docs/INDEX.md`、`docs/CODING_RULES.md`、`docs/DEBUG_GUIDE.md`、`docs/ERROR_CATALOG.md`。
+- 先读取 `AGENTS.md`、`AI_README.md`、`docs/AGENT_MODEL_ROLES.md`、`docs/INDEX.md`、`docs/CODING_RULES.md`、`docs/DEBUG_GUIDE.md`、`docs/ERROR_CATALOG.md`。
+- 复杂调试默认使用 SOL；明确修复范围后再交给 TERRA。
 - 先定位疑似归属模块和风险区域，再提出修改方案。
 - 区分观察事实、推测和待验证假设。
 - 不要把日志全文复制进文档，只摘录关键片段。
